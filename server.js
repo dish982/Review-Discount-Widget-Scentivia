@@ -185,7 +185,7 @@ app.post("/api/submit-review", upload.array("photos", 5), async (req, res) => {
 
     // Generate unique 10% coupon code string
     const uniqueId = Math.random().toString(36).substring(2, 7).toUpperCase();
-    const calculatedCouponCode = `REVIEW10-${uniqueId}`;
+    const calculatedCouponCode = `REVIEW-${uniqueId}`;
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
     // Core GraphQL Bundle Mutation
