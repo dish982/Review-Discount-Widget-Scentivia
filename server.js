@@ -272,6 +272,13 @@ mutation UpdateReviewMetaobject(
         code: calculatedCouponCode,
         startsAt: new Date().toISOString(),
         endsAt: expiresAt.toISOString(),
+
+        combinesWith: {
+          productDiscounts: true,
+          orderDiscounts: true,
+          shippingDiscounts: false
+        },
+
         customerSelection: {
           all: true
         },
