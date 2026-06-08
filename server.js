@@ -218,6 +218,27 @@ app.post("/api/submit-review", upload.array("photos", 5), async (req, res) => {
       }
     `;
 
+      // delete discount mutation query
+  const updateMetaobjectMutation = `
+mutation UpdateReviewMetaobject(
+  $id: ID!,
+  $metaobject: MetaobjectUpdateInput!
+) {
+  metaobjectUpdate(
+    id: $id,
+    metaobject: $metaobject
+  ) {
+    metaobject {
+      id
+    }
+    userErrors {
+      field
+      message
+    }
+  }
+}
+`;
+
     if (req.files?.length && uploadedImageGids.length === 0) {
       return res.status(500).json({
         success: false,
@@ -306,6 +327,44 @@ app.post("/api/submit-review", upload.array("photos", 5), async (req, res) => {
         error: `Discount Creation Failure: ${discountCodeBasicCreate.userErrors[0].message}` 
       });
     }
+
+    const metaobjectId = metaobjectCreate.metaobject.id;
+    const discountNodeId = discountCodeBasicCreate.codeDiscountNode.id;
+
+
+    const updateVariables = {
+      id: metaobjectId,
+      metaobject: {
+        fields: [
+          {
+            key: "discount_id",
+            value: discountNodeId
+          },
+          {
+            key: "discount_expire_at",
+            value: expiresAt.toISOString()
+          },
+          {
+            key: "created_date",
+            value: new Date().toISOString()
+          }
+        ]
+      }
+    };
+
+    const updateResponse = await fetch(GRAPHQL_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Shopify-Access-Token": SHOPIFY_ADMIN_TOKEN
+      },
+      body: JSON.stringify({
+        query: updateMetaobjectMutation,
+        variables: updateVariables
+      })
+    });
+
+    const updateBody = await updateResponse.json();
 
     console.log(`Review sync complete for ${customer_name}. Code Generated: ${calculatedCouponCode}`);
     
