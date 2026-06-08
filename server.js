@@ -277,7 +277,7 @@ mutation UpdateReviewMetaobject(
         },
         customerGets: {
           value: {
-            percentage: 0.10
+            percentage: 0.05
           },
           items: {
             all: true
